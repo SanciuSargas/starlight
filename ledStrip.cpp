@@ -17,18 +17,22 @@ int lightDotTrailLenght = 0;
 int maxLightDotTrailLength = 0;
 
 void setupLEDstrip(int NUM_LEDS) {
-  maxLightDotTrailLength = NUM_LEDS / 2 - NUM_LEDS / 10;
+  maxLightDotTrailLength = NUM_LEDS / 2 - 2;
 }
 
 void updateLightDotTrailLength(int JOYSTICK_Y) {
   unsigned long currentMillis = millis();
   int analogValueForJOYSTICK_Y = analogRead(JOYSTICK_Y);
-  delayBetweenTrailChange = map(abs(analogValueForJOYSTICK_Y-520), 0, 512, 1000, 20);
+  
+
+  delayBetweenTrailChange = map(abs(analogValueForJOYSTICK_Y-532), 0, 512, 1000, 100);
 
   if (currentMillis - previousMillisForTrailChange >= delayBetweenTrailChange) {
     previousMillisForTrailChange = currentMillis;
 
-    if (analogValueForJOYSTICK_Y > 530) {
+    Serial.println(analogValueForJOYSTICK_Y);
+    
+    if (analogValueForJOYSTICK_Y > 550) {
       lightDotTrailLenght++;
 
       if (lightDotTrailLenght >= maxLightDotTrailLength){
@@ -41,11 +45,10 @@ void updateLightDotTrailLength(int JOYSTICK_Y) {
         lightDotTrailLenght = 0;
       }
     }
-
   }
 }
 
-void updateLightDotColor(int POT_1, int POT_2, int POT_3, int& currentLed, CRGB* leds) {
+void updateLightDotColor(int POT_1, int POT_2, int POT_3, int& currentLed, int NUM_LEDS, CRGB* leds) {
   unsigned long currentMillis = millis();
 
   if (currentMillis - previousMillisForColorChange >= delayBetweenColorChange) {
@@ -55,8 +58,9 @@ void updateLightDotColor(int POT_1, int POT_2, int POT_3, int& currentLed, CRGB*
     blueValue = analogRead(POT_2) / 4;
     greenValue = analogRead(POT_3) / 4;
 
-    leds[currentLed] = CRGB(redValue, greenValue, blueValue);
-    FastLED.show();
+    //setLightDotTrail(currentLed, NUM_LEDS, leds, 1);
+    //leds[currentLed] = CRGB(redValue, greenValue, blueValue);
+    //FastLED.show();
   }
 }
 
@@ -64,7 +68,7 @@ void updateLightDotPosition(int JOYSTICK_X, int& currentLed, int NUM_LEDS, CRGB*
   unsigned long currentMillis = millis();
   int analogValueForJOYSTICK_X = analogRead(JOYSTICK_X);
      
-  delayBetweenMoves = map(abs(analogValueForJOYSTICK_X-520), 0, 512, 1000, 20);
+  delayBetweenMoves = map(abs(analogValueForJOYSTICK_X-520), 0, 512, 1000, 40);
 
   if (currentMillis - previousMillisForDotMovement >= delayBetweenMoves) {
     previousMillisForDotMovement = currentMillis;
@@ -88,8 +92,12 @@ void updateLightDotPosition(int JOYSTICK_X, int& currentLed, int NUM_LEDS, CRGB*
     }
 
     //leds[currentLed] = CRGB(redValue, greenValue, blueValue);
-    FastLED.show();
-  } 
+    //FastLED.show();
+  } else if (currentMillis - previousMillisForDotMovement >= 20) {
+    if (analogValueForJOYSTICK_X < 530 && analogValueForJOYSTICK_X > 500 ) {
+     setLightDotTrail(currentLed, NUM_LEDS, leds, 1);
+    }
+  }
 }
 
 // shadow options:
@@ -98,23 +106,43 @@ void updateLightDotPosition(int JOYSTICK_X, int& currentLed, int NUM_LEDS, CRGB*
 //  2 = right
 void setLightDotTrail(int currentLed, int NUM_LEDS, CRGB* leds, int trailOption) {
 
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CRGB(0, 0, 0);
+  }
+  
+  leds[currentLed] = CRGB(redValue, greenValue, blueValue);
+
   if (trailOption == 0 or trailOption == 1) {
     for (int i = 1; i <= lightDotTrailLenght; i++) {
+      double ledBrightnessMultiplier = (0.2 * (double(lightDotTrailLenght - i + 1) / double(lightDotTrailLenght))); 
+      
+      int redValueTrail = redValue*ledBrightnessMultiplier;
+      int greenValueTrail = greenValue*ledBrightnessMultiplier;
+      int blueValueTrail = blueValue*ledBrightnessMultiplier;
+
       if (currentLed - i >= 0) {
-        leds[currentLed - i] = CRGB(100, 0, 0);
+        leds[currentLed - i] = CRGB(redValueTrail, greenValueTrail, blueValueTrail);
       } else {
-        leds[NUM_LEDS - (i - currentLed) - 1] = CRGB(100, 0, 0);
+        leds[NUM_LEDS - (i - currentLed) ] = CRGB(redValueTrail, greenValueTrail, blueValueTrail);
       }
     }
   }
 
   if (trailOption == 2 or trailOption == 1) {
     for (int i = 1; i <= lightDotTrailLenght; i++) {
+      double ledBrightnessMultiplier = (0.2 * (double(lightDotTrailLenght - i + 1) / double(lightDotTrailLenght))); 
+      
+      int redValueTrail = redValue*ledBrightnessMultiplier;
+      int greenValueTrail = greenValue*ledBrightnessMultiplier;
+      int blueValueTrail = blueValue*ledBrightnessMultiplier;
+
       if (currentLed + i < NUM_LEDS) {
-        leds[currentLed + i] = CRGB(100, 0, 0);
+        leds[currentLed + i] = CRGB(redValueTrail, greenValueTrail, blueValueTrail);
       } else {
-        leds[i - (NUM_LEDS - currentLed)] = CRGB(100, 0, 0);
+        leds[i - (NUM_LEDS - currentLed)] = CRGB(redValueTrail, greenValueTrail, blueValueTrail);
       }
     }
   }
+
+  FastLED.show();
 }
