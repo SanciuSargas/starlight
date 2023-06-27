@@ -92,6 +92,7 @@ void loop() {
   if (currentMenuOption == 0) {
     stepperMotorAutomaticState(myStepper, STEPPER_ENABLE_A, STEPPER_ENABLE_B);
   } else if (currentMenuOption == 1) {
+    automaticallyUpdateLightDotPosition(JOYSTICK_Y, currentLed, NUM_LEDS, leds);
   }
 
   

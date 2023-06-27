@@ -10,6 +10,9 @@ int delayBetweenTrailChange = 10;
 unsigned long previousMillisForDotMovement = 0;
 int delayBetweenMoves = 10;
 
+unsigned long previousMillisForAutomaticDotMovement = 0;
+int delayBetweenAutomaticMoves = 10;
+
 unsigned long previousMillisForColorChange = 0;
 int delayBetweenColorChange = 10;
 
@@ -60,6 +63,33 @@ void updateLightDotColor(int POT_1, int POT_2, int POT_3, int& currentLed, int N
     //leds[currentLed] = CRGB(redValue, greenValue, blueValue);
     //FastLED.show();
   }
+}
+
+void automaticallyUpdateLightDotPosition(int JOYSTICK_Y, int& currentLed, int NUM_LEDS, CRGB* leds) {
+  unsigned long currentMillis = millis();
+  int analogValueForJOYSTICK_Y = analogRead(JOYSTICK_Y) - 400;
+  if (analogValueForJOYSTICK_Y < 60) {
+    analogValueForJOYSTICK_Y = 60;
+  } else if (analogValueForJOYSTICK_Y >= 623) {
+    analogValueForJOYSTICK_Y = 623;
+  }
+
+  lightDotTrailLenght = maxLightDotTrailLength/2;
+     
+  delayBetweenAutomaticMoves = map(analogValueForJOYSTICK_Y, 0, 623, 1, 100);
+
+  if (currentMillis - previousMillisForAutomaticDotMovement >= delayBetweenAutomaticMoves) {
+    previousMillisForAutomaticDotMovement = currentMillis;
+
+    leds[currentLed] = CRGB(0, 0, 0);
+
+    currentLed++;
+    if (currentLed >= NUM_LEDS){
+      currentLed = 0;
+    }
+
+    setLightDotTrail(currentLed, NUM_LEDS, leds, 0);
+  } 
 }
 
 void updateLightDotPosition(int JOYSTICK_X, int& currentLed, int NUM_LEDS, CRGB* leds) {
@@ -144,3 +174,5 @@ void setLightDotTrail(int currentLed, int NUM_LEDS, CRGB* leds, int trailOption)
 
   FastLED.show();
 }
+
+

@@ -13,12 +13,13 @@ void updateStepperMotorPosition(int JOYSTICK_X, Stepper myStepper, int STEPPER_E
   unsigned long currentMillis = millis();
   int analogValueForJOYSTICK_X = analogRead(JOYSTICK_X);
 
-  digitalWrite(STEPPER_ENABLE_A, HIGH); 
-  digitalWrite(STEPPER_ENABLE_B, HIGH); 
-    
+   
   delayBetweenStepperMoves = map(abs(analogValueForJOYSTICK_X-520), 0, 512, 1000, 40);
 
   if (currentMillis - previousMillisForStepperMotorPosition  >= delayBetweenStepperMoves)  {
+    digitalWrite(STEPPER_ENABLE_A, HIGH); 
+    digitalWrite(STEPPER_ENABLE_B, HIGH); 
+    
     previousMillisForStepperMotorPosition  = currentMillis;
  
     if (analogValueForJOYSTICK_X > 530) {
