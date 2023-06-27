@@ -4,7 +4,8 @@
 #include <Arduino.h>
 
 void setupStepperMotor(Stepper& myStepper);
-void stepperMotorAutomaticState(Stepper myStepper, int stepsPerRevolution, int STEPPER_ENABLE_A, int STEPPER_ENABLE_B);
+void updateStepperMotorPosition(int JOYSTICK_X, Stepper myStepper, int STEPPER_ENABLE_A, int STEPPER_ENABLE_B);
+void stepperMotorAutomaticState(Stepper myStepper, int STEPPER_ENABLE_A, int STEPPER_ENABLE_B);
 
 
 #endif

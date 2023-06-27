@@ -85,11 +85,12 @@ void loop() {
     updateLightDotColor(POT_1, POT_2, POT_3, currentLed, NUM_LEDS, leds);
     updateLightDotPosition(JOYSTICK_X, currentLed, NUM_LEDS, leds);
   } else if (currentMenuOption == 1) {
+    updateStepperMotorPosition(JOYSTICK_X, myStepper, STEPPER_ENABLE_A, STEPPER_ENABLE_B);
   }
 
   //uncontroled/default part
   if (currentMenuOption == 0) {
-    stepperMotorAutomaticState(myStepper, stepsPerRevolution, STEPPER_ENABLE_A, STEPPER_ENABLE_B);
+    stepperMotorAutomaticState(myStepper, STEPPER_ENABLE_A, STEPPER_ENABLE_B);
   } else if (currentMenuOption == 1) {
   }
 
