@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 void setupStepperMotor(Stepper& myStepper);
-void spinStepperMotorLeftRight(Stepper myStepper, int stepsPerRevolution);
+void stepperMotorAutomaticState(Stepper myStepper, int stepsPerRevolution, int STEPPER_ENABLE_A, int STEPPER_ENABLE_B);
 
 
 #endif

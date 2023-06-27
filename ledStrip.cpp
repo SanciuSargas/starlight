@@ -29,8 +29,6 @@ void updateLightDotTrailLength(int JOYSTICK_Y) {
 
   if (currentMillis - previousMillisForTrailChange >= delayBetweenTrailChange) {
     previousMillisForTrailChange = currentMillis;
-
-    Serial.println(analogValueForJOYSTICK_Y);
     
     if (analogValueForJOYSTICK_Y > 550) {
       lightDotTrailLenght++;

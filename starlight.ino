@@ -1,8 +1,9 @@
 //#include <FastLED.h>
 #include "ledStrip.h"
 #include "stepperMotorControl.h"
+#include "lightBulbControl.h"
 
-#define JOYSTICK_BUTTON 2
+#define JOYSTICK_BUTTON 4
 #define LED_PIN 7
 #define NUM_LEDS 16
 
@@ -13,15 +14,17 @@
 #define JOYSTICK_Y A3
 #define JOYSTICK_X A4
 
+#define STEPPER_ENABLE_A 12
+#define STEPPER_ENABLE_B 13
+
+#define LIGHT_GATE_1 2
+#define LIGHT_GATE_2 3
+#define LIGHT_BULB_RELAY 5
+
 //settings for the menu
 bool lastMenuButtonState = true;
 int currentMenuOption = 0;
 int numberOfMenuOptions = 2;
-
-// variables for LED strip color
-//int redValue = 0;
-//int greenValue = 0;
-//int blueValue = 0;
 
 // variables for light dot movement
 int currentLed = 0;
@@ -46,18 +49,23 @@ void setup() {
   pinMode(JOYSTICK_X, INPUT);
   pinMode(JOYSTICK_Y, INPUT);
 
+  pinMode(STEPPER_ENABLE_A, OUTPUT);
+  pinMode(STEPPER_ENABLE_B, OUTPUT);
+
+  pinMode(LIGHT_GATE_1, INPUT);
+  pinMode(LIGHT_GATE_1, INPUT);
+  pinMode(LIGHT_BULB_RELAY, OUTPUT);
+
   Serial.begin(9600);
   setupLEDstrip(NUM_LEDS);
   setupStepperMotor(myStepper);
+  setupLightBulbModule();
   
   FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
-
-  //setupLEDstrip(leds, NUM_LEDS, LED_PIN);
 }
 
 void loop() {
   unsigned long currentMillis = millis();
-  //Serial.println(analogRead(POT_2));
   
   //changing the menue with a button click
   if (digitalRead(JOYSTICK_BUTTON) == LOW and lastMenuButtonState) {
@@ -77,14 +85,15 @@ void loop() {
     updateLightDotColor(POT_1, POT_2, POT_3, currentLed, NUM_LEDS, leds);
     updateLightDotPosition(JOYSTICK_X, currentLed, NUM_LEDS, leds);
   } else if (currentMenuOption == 1) {
-    spinStepperMotorLeftRight(myStepper, stepsPerRevolution);
   }
 
   //uncontroled/default part
   if (currentMenuOption == 0) {
-    
+    stepperMotorAutomaticState(myStepper, stepsPerRevolution, STEPPER_ENABLE_A, STEPPER_ENABLE_B);
   } else if (currentMenuOption == 1) {
   }
 
+  
+  checkLightGateState(LIGHT_GATE_1, LIGHT_GATE_2, LIGHT_BULB_RELAY);
 }
 
